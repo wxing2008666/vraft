@@ -1,0 +1,51 @@
+@startuml
+' object graph
+class Leader {
+    id
+    term = 0
+    commitIndex = 0
+    lastAppliedIndex = 0
+
+    followers[]
+    entries[]
+}
+
+class Follower {
+    id
+    leader
+    commitIndex = 0
+    lastAppliedIndex = 0
+'    next log entry to be sent by leader
+    nextIndex
+'    index of highest log entry known to be replicated on server
+    matchIndex = 0
+    voteFor
+    entries[]
+}
+
+class Candidate {
+    id
+    term = 0
+    commitIndex = 0
+    lastAppliedIndex = 0
+    followers[]
+    entries[]
+}
+
+class LogEntry {
+    index
+    term
+    leaderId
+
+    payload
+    createTime
+}
+
+Follower --> Leader
+Leader --> Follower
+Leader --> LogEntry
+Follower --> LogEntry
+Candidate --> LogEntry
+Candidate --> Follower
+
+@enduml
