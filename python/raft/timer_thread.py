@@ -1,8 +1,8 @@
 import sys
 from random import randrange
 import threading
-import time
 
+from client import Client
 from cluster import Cluster
 cluster = Cluster()
 
@@ -15,10 +15,12 @@ class TimerThread(threading.Thread):
 
     def request_vote(self, peer):
         print(f' {self.node} request_vote from: {peer} ')
+        r = Client.get_session().post(f'http://{peer.uri}/raft/vote', json={"key": "value"})
+        print(f'got vote result: {r.status_code}: {r.json()}')
 
     def become_candidate(self):
         print(f'election_timeout: {int(self.election_timeout)} s')
-        print(f'become candidate and start to elect ... ')
+        print(f'become candidate and start to request vote ... ')
 
         for peer in cluster:
             if peer != self.node:
