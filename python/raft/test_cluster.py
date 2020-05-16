@@ -1,4 +1,4 @@
-from cluster import Cluster
+from raft.cluster import Cluster
 
 
 class TestCluster:
