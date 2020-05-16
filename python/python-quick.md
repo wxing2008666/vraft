@@ -1,9 +1,11 @@
 ## use pytest
-Install pytest
+### Install pytest
 ```shell script
 pip install -U pytest
 pytest --version
 ```
+### Enable pytest as default test runner
+In the **Default test runner** field select pytest.
 
 ## fluent sample code 
 [fluent python](https://github.com/fluentpython/example-code)

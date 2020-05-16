@@ -1,0 +1,78 @@
+@startuml
+'Mutable sequences
+'list, bytearray, array.array, collections.deque, and memoryview
+'
+'Immutable sequences
+'tuple, str, and bytes
+
+'Container sequences
+'list, tuple, and collections.deque can hold items of different types, including nested containers.
+'
+'Flat sequences
+'str, bytes, bytearray, memoryview, and array.array hold items of one simple type.
+
+Abstract Iterable {
+    m __iter__
+}
+Abstract Sized {
+    m __len__
+}
+Abstract Container {
+    m __contains__
+}
+Abstract Reversible {
+    m __reversed__
+}
+Abstract Collection
+
+class Sequence {
+    m __getitem__
+    index
+    count
+}
+class Mapping {
+    m __getitem__
+    m __eq__
+    m __nq__
+    get
+    items
+    keys
+    values
+}
+class Set {
+    m __eq__
+    m __nq__
+    m __lt__
+    m __le__
+    m __gt__
+    m __ge__
+    m __and__
+    m __or__
+    m __sub__
+    m __xor__
+    isdisjoint
+}
+
+class MutableSequence {
+    m __setitem__
+    m __delitem__
+    m __iadd__
+    insert
+    append
+    reverse
+    extend
+    pop
+    remove
+}
+
+Reversible <|-- Sequence
+Collection <|-- Sequence
+Collection <|-- Mapping
+Collection <|-- Set
+Iterable <|-- Reversible
+Iterable <|-- Collection
+Sized <|-- Collection
+Container <|-- Collection
+Sequence <|-- MutableSequence
+
+@enduml

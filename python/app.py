@@ -4,8 +4,8 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+def hello_raft():
+    return 'raft cluster: '
 
 
 if __name__ == '__main__':
