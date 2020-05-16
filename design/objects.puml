@@ -1,5 +1,5 @@
 @startuml
-' object graph
+' https://github.com/visualizit/vraft
 class Leader {
     id
     term = 0
