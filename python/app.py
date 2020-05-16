@@ -1,8 +1,22 @@
+import os
 from flask import Flask
 from raft.cluster import Cluster
 from timer_thread import TimerThread
 
-app = Flask(__name__)
+
+def start_timer():
+    print("start timer")
+    timer_thread = TimerThread(int(os.environ.get('NODE_ID')))
+    timer_thread.start()
+
+
+def create_app():
+    raft = Flask(__name__)
+    start_timer()
+    return raft
+
+
+app = create_app()
 
 
 @app.route('/')
@@ -12,6 +26,5 @@ def hello_raft():
 
 
 if __name__ == '__main__':
-    timerThread = TimerThread()
-    timerThread.start()
+    create_app()
     app.run()
