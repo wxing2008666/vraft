@@ -1,5 +1,6 @@
 from flask import Flask
 from raft.cluster import Cluster
+from timer_thread import TimerThread
 
 app = Flask(__name__)
 
@@ -11,4 +12,6 @@ def hello_raft():
 
 
 if __name__ == '__main__':
+    timerThread = TimerThread()
+    timerThread.start()
     app.run()
