@@ -1,3 +1,7 @@
+import json
+
+import grequests
+
 from Follower import Follower
 from NodeState import NodeState
 from client import Client
@@ -13,19 +17,23 @@ class Candidate(NodeState):
         self.entries = []
         self.followers = [peer for peer in self.cluster if peer != self.node]
 
-    def request_vote(self, peer):
-        print(f' {self.node} sent request vote to: {peer} ')
+    def elect(self):
+        print(f' {self.node} sent request vote to peers ')
+        # vote itself
+        self.votes.append(self.node)
         client = Client()
         with client as session:
-            response = session.post(f'http://{peer.uri}/raft/vote', json=self.node)
-            print(f'got vote result: {response.status_code}: {response.json()}')
-            return response.json()
+            posts = [
+                grequests.post(f'http://{peer.uri}/raft/vote', json=self.node, session=session)
+                for peer in self.followers
+            ]
+            for response in grequests.imap(posts):
+                print(f'got vote result: {response.status_code}: {response.json()}')
+                result = response.json()
+                if result['vote']:
+                    self.votes.append(result['node'])
 
-    def elect(self):
-        for peer in self.followers:
-            response = self.request_vote(peer)
-            if response['vote']:
-                self.votes.append(Follower(peer))
+        return response.json()
 
     def win(self):
-        return len(self.votes) > len(self.cluster)/2
+        return len(self.votes) > len(self.cluster) / 2

@@ -5,8 +5,8 @@ import threading
 from Candidate import Candidate
 from Follower import Follower
 from Leader import Leader
-from client import Client
-from cluster import Cluster
+from cluster import Cluster, ELECTION_TIMEOUT_MAX
+
 cluster = Cluster()
 
 
@@ -43,10 +43,13 @@ class TimerThread(threading.Thread):
         return result
 
     def become_follower(self):
-        print(f'become follower and reset election timer ... ')
-        self.node_state = Follower(self.node)
+        timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX))
+        if type(self.node_state) != Follower:
+            print(f'{self.node} become follower ... ')
+            self.node_state = Follower(self.node)
+        print(f'follower {self.node} reset election timer {timeout} s ... ')
         self.election_timer.cancel()
-        self.election_timer = threading.Timer(float(randrange(1, 3)), self.become_candidate)
+        self.election_timer = threading.Timer(timeout, self.become_candidate)
         self.election_timer.start()
 
     def run(self):

@@ -1,4 +1,10 @@
+import time
+from datetime import datetime
+
+import grequests
 from NodeState import NodeState
+from client import Client
+from cluster import HEART_BEAT_INTERVAL
 
 
 class Leader(NodeState):
@@ -8,11 +14,19 @@ class Leader(NodeState):
         self.commitIndex = 0
         self.lastAppliedIndex = 0
         self.entries = []
+        self.stopped = False
         self.followers = [peer for peer in self.cluster if peer != self.node]
 
-    def _heartbeat(self, peer):
-        print(f'leader ({self.node}) send heartbeat to peer: {peer}')
-
     def heartbeat(self):
-        for peer in self.followers:
-            self._heartbeat(peer)
+        while not self.stopped:
+            now = datetime.now().astimezone().replace(microsecond=0).isoformat()
+            print(f'{now}: leader ({self.node}) send heartbeat to followers')
+            client = Client()
+            with client as session:
+                posts = [
+                    grequests.post(f'http://{peer.uri}/raft/heartbeat', json=self.node, session=session)
+                    for peer in self.followers
+                ]
+                for response in grequests.map(posts, gtimeout=HEART_BEAT_INTERVAL):
+                    print(f'leader ({self.node}) got heartbeat from follower: {response.json()}')
+            time.sleep(HEART_BEAT_INTERVAL)

@@ -29,7 +29,10 @@ def request_vote():
 
 @app.route('/raft/heartbeat', methods=['POST'])
 def heartbeat():
+    leader = request.get_json()
+    print(f'follower ({node}) got heartbeat from leader: {leader}')
     d = {"alive": True, "node": node}
+    timer_thread.become_follower()
     return jsonify(d)
 
 

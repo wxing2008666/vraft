@@ -2,6 +2,8 @@ import collections
 
 Node = collections.namedtuple('Node', ['id', 'uri'])
 CLUSTER_SIZE = 3
+ELECTION_TIMEOUT_MAX = 10
+HEART_BEAT_INTERVAL = float(ELECTION_TIMEOUT_MAX/5)
 
 
 class Cluster:
