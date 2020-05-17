@@ -9,7 +9,7 @@ class Client:
 
     def __enter__(self):
         self.session = requests.Session()
-        retries = Retry(total=5000,
+        retries = Retry(total=1000000,
                         backoff_factor=0.1,
                         status_forcelist=[404])
         self.session.mount('http://', HTTPAdapter(max_retries=retries))

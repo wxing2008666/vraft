@@ -2,8 +2,8 @@ from NodeState import NodeState
 
 
 class Leader(NodeState):
-    def __init__(self, node_id):
-        self.id = node_id
+    def __init__(self, node):
+        super(Leader, self).__init__(node)
         self.term = 0
         self.commitIndex = 0
         self.lastAppliedIndex = 0

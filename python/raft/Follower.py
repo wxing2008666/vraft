@@ -2,8 +2,8 @@ from NodeState import NodeState
 
 
 class Follower(NodeState):
-    def __init__(self, node_id):
-        self.id = node_id
+    def __init__(self, node):
+        super(Follower, self).__init__(node)
         self.leader = None
         self.commitIndex = 0
         self.lastAppliedIndex = 0
