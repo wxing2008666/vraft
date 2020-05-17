@@ -1,10 +1,11 @@
 import collections
 
 Node = collections.namedtuple('Node', ['id', 'uri'])
+CLUSTER_SIZE = 3
 
 
 class Cluster:
-    ids = range(0, 3)
+    ids = range(0, CLUSTER_SIZE)
     uris = [f'localhost:500{n}' for n in ids]
 
     def __init__(self):
