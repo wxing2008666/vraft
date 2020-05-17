@@ -4,6 +4,7 @@ import threading
 
 from Candidate import Candidate
 from Follower import Follower
+from Leader import Leader
 from client import Client
 from cluster import Cluster
 cluster = Cluster()
@@ -17,21 +18,18 @@ class TimerThread(threading.Thread):
         self.node = cluster[node_id]
         self.node_state = Follower(self.node)
 
-    def request_vote(self, peer):
-        print(f' {self.node} sent request vote to: {peer} ')
-        client = Client()
-        with client as session:
-            response = session.post(f'http://{peer.uri}/raft/vote', json=self.node)
-            print(f'got vote result: {response.status_code}: {response.json()}')
+    def become_leader(self):
+        print(f'become leader and start to send heartbeat ... ')
+        self.node_state = Leader(self.node)
+        self.node_state.heartbeat()
 
     def become_candidate(self):
         print(f'heartbeat is timeout: {int(self.election_timeout)} s')
         print(f'become candidate and start to request vote ... ')
         self.node_state = Candidate(self.node)
-        for peer in cluster:
-            if peer != self.node:
-                self.request_vote(peer)
-                self.node_state.followers.append(Follower(peer))
+        self.node_state.elect()
+        if self.node_state.win():
+            self.become_leader()
 
     def vote(self, candidate):
         print(f' {self.node} got request vote from: {candidate} ')
