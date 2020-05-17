@@ -1,4 +1,7 @@
-class Follower:
+from NodeState import NodeState
+
+
+class Follower(NodeState):
     def __init__(self, node_id):
         self.id = node_id
         self.leader = None

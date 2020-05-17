@@ -17,5 +17,5 @@ class Cluster:
     def __getitem__(self, index):
         return self._nodes[index]
 
-    def __str__(self):
+    def __repr__(self):
         return ", ".join([f'{n.id}@{n.uri}' for n in self._nodes])

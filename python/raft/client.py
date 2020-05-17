@@ -4,11 +4,17 @@ from requests.adapters import HTTPAdapter
 
 
 class Client:
-    @staticmethod
-    def get_session():
-        s = requests.Session()
+    def __init__(self):
+        self.session = None
+
+    def __enter__(self):
+        self.session = requests.Session()
         retries = Retry(total=5000,
                         backoff_factor=0.1,
                         status_forcelist=[404])
-        s.mount('http://', HTTPAdapter(max_retries=retries))
-        return s
+        self.session.mount('http://', HTTPAdapter(max_retries=retries))
+        return self.session
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.session.close()
+        self.session = None
