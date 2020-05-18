@@ -19,7 +19,7 @@ class Leader(NodeState):
 
     def heartbeat(self):
         while not self.stopped:
-            logging.info(f'leader ({self.node}) send heartbeat to followers')
+            logging.info(f'{self} send heartbeat to followers')
             logging.info('========================================================================')
             client = Client()
             with client as session:
@@ -29,8 +29,11 @@ class Leader(NodeState):
                 ]
                 for response in grequests.map(posts, gtimeout=HEART_BEAT_INTERVAL):
                     if response is not None:
-                        logging.info(f'leader ({self.node}) got heartbeat from follower: {response.json()}')
+                        logging.info(f'{self} got heartbeat from follower: {response.json()}')
                     else:
-                        logging.info(f'leader ({self.node}) got heartbeat from follower: None')
+                        logging.info(f'{self} got heartbeat from follower: None')
             logging.info('========================================================================')
             time.sleep(HEART_BEAT_INTERVAL)
+
+    def __repr__(self):
+        return f'{type(self).__name__, self.node.id, self.term}'
