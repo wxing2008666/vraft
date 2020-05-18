@@ -1,9 +1,13 @@
 from gevent import monkey
+
 monkey.patch_all()
+import logging
 import os
 from flask import Flask, jsonify, request
 from raft.cluster import Cluster
 from timer_thread import TimerThread
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
 NODE_ID = int(os.environ.get('NODE_ID'))
 cluster = Cluster()
@@ -30,7 +34,7 @@ def request_vote():
 @app.route('/raft/heartbeat', methods=['POST'])
 def heartbeat():
     leader = request.get_json()
-    print(f'follower ({node}) got heartbeat from leader: {leader}')
+    logging.info(f'follower ({node}) got heartbeat from leader: {leader}')
     d = {"alive": True, "node": node}
     timer_thread.become_follower()
     return jsonify(d)

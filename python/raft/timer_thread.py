@@ -1,7 +1,8 @@
 import sys
-from datetime import datetime
-from random import randrange
 import threading
+from random import randrange
+import logging
+logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
 from Candidate import Candidate
 from Follower import Follower
@@ -20,14 +21,13 @@ class TimerThread(threading.Thread):
         self.node_state = Follower(self.node)
 
     def become_leader(self):
-        print(f'become leader and start to send heartbeat ... ')
+        logging.info(f'become leader and start to send heartbeat ... ')
         self.node_state = Leader(self.node)
         self.node_state.heartbeat()
 
     def become_candidate(self):
-        now = datetime.now().astimezone().replace(microsecond=0).isoformat()
-        print(f'heartbeat is timeout: {int(self.election_timeout)} s')
-        print(f'{now} {self.node} become candidate and start to request vote ... ')
+        logging.warning(f'heartbeat is timeout: {int(self.election_timeout)} s')
+        logging.info(f'{self.node} become candidate and start to request vote ... ')
         self.node_state = Candidate(self.node)
         self.node_state.elect()
         if self.node_state.win():
@@ -36,22 +36,22 @@ class TimerThread(threading.Thread):
             self.become_follower()
 
     def vote(self, candidate):
-        print(f' {self.node} got request vote from: {candidate} ')
+        logging.info(f' {self.node} got request vote from: {candidate} ')
         result = {"vote": False, "node": self.node, "candidate": candidate}
         if type(self.node_state) == Follower and self.node_state.voteFor is None:
             self.node_state.voteFor = candidate
             result["vote"] = True
             self.become_follower()
 
-        print(f'return vote result: {result} ')
+        logging.info(f'return vote result: {result} ')
         return result
 
     def become_follower(self):
         timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX))
         if type(self.node_state) != Follower:
-            print(f'{self.node} become follower ... ')
+            logging.info(f'{self.node} become follower ... ')
             self.node_state = Follower(self.node)
-        print(f'follower {self.node} reset election timer {timeout} s ... ')
+        logging.info(f'follower {self.node} reset election timer {timeout} s ... ')
         self.election_timer.cancel()
         self.election_timer = threading.Timer(timeout, self.become_candidate)
         self.election_timer.start()

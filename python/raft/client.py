@@ -4,7 +4,7 @@ from requests.adapters import HTTPAdapter
 
 
 class Client:
-    def __init__(self, retry=3):
+    def __init__(self, retry=0):
         self.session = None
         self.retry = retry
 

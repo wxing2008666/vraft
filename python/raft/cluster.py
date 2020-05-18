@@ -21,3 +21,8 @@ class Cluster:
 
     def __repr__(self):
         return ", ".join([f'{n.id}@{n.uri}' for n in self._nodes])
+
+
+if __name__ == '__main__':
+    cluster = Cluster()
+    print(cluster)

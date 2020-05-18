@@ -1,10 +1,10 @@
 import time
-from datetime import datetime
-
 import grequests
 from NodeState import NodeState
 from client import Client
 from cluster import HEART_BEAT_INTERVAL
+import logging
+logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
 
 class Leader(NodeState):
@@ -19,9 +19,8 @@ class Leader(NodeState):
 
     def heartbeat(self):
         while not self.stopped:
-            now = datetime.now().astimezone().replace(microsecond=0).isoformat()
-            print(f'{now}: leader ({self.node}) send heartbeat to followers')
-            print('==========================================================')
+            logging.info(f'leader ({self.node}) send heartbeat to followers')
+            logging.info('==========================================================')
             client = Client()
             with client as session:
                 posts = [
@@ -30,8 +29,8 @@ class Leader(NodeState):
                 ]
                 for response in grequests.map(posts, gtimeout=HEART_BEAT_INTERVAL):
                     if response is not None:
-                        print(f'leader ({self.node}) got heartbeat from follower: {response.json()}')
+                        logging.info(f'leader ({self.node}) got heartbeat from follower: {response.json()}')
                     else:
-                        print(f'leader ({self.node}) got heartbeat from follower: None')
-            print('==========================================================')
+                        logging.info(f'leader ({self.node}) got heartbeat from follower: None')
+            logging.info('==========================================================')
             time.sleep(HEART_BEAT_INTERVAL)

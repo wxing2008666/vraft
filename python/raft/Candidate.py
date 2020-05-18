@@ -1,6 +1,8 @@
 import grequests
 from NodeState import NodeState
 from client import Client
+import logging
+logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
 
 class Candidate(NodeState):
@@ -14,7 +16,7 @@ class Candidate(NodeState):
         self.followers = [peer for peer in self.cluster if peer != self.node]
 
     def elect(self):
-        print(f' {self.node} sent request vote to peers ')
+        logging.info(f'{self.node} sent request vote to peers ')
         # vote itself
         self.votes.append(self.node)
         client = Client()
@@ -24,12 +26,10 @@ class Candidate(NodeState):
                 for peer in self.followers
             ]
             for response in grequests.imap(posts):
-                print(f'got vote result: {response.status_code}: {response.json()}')
+                logging.info(f'got vote result: {response.status_code}: {response.json()}')
                 result = response.json()
                 if result['vote']:
                     self.votes.append(result['node'])
-
-        return response.json()
 
     def win(self):
         return len(self.votes) > len(self.cluster) / 2
