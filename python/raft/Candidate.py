@@ -1,8 +1,4 @@
-import json
-
 import grequests
-
-from Follower import Follower
 from NodeState import NodeState
 from client import Client
 

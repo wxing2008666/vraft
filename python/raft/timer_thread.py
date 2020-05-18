@@ -1,4 +1,5 @@
 import sys
+from datetime import datetime
 from random import randrange
 import threading
 
@@ -24,8 +25,9 @@ class TimerThread(threading.Thread):
         self.node_state.heartbeat()
 
     def become_candidate(self):
+        now = datetime.now().astimezone().replace(microsecond=0).isoformat()
         print(f'heartbeat is timeout: {int(self.election_timeout)} s')
-        print(f'become candidate and start to request vote ... ')
+        print(f'{now} {self.node} become candidate and start to request vote ... ')
         self.node_state = Candidate(self.node)
         self.node_state.elect()
         if self.node_state.win():

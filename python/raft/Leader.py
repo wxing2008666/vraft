@@ -28,5 +28,9 @@ class Leader(NodeState):
                     for peer in self.followers
                 ]
                 for response in grequests.map(posts, gtimeout=HEART_BEAT_INTERVAL):
-                    print(f'leader ({self.node}) got heartbeat from follower: {response.json()}')
+                    if response is not None:
+                        print(f'leader ({self.node}) got heartbeat from follower: {response.json()}')
+                    else:
+                        print(f'leader ({self.node}) got heartbeat from follower: None')
+
             time.sleep(HEART_BEAT_INTERVAL)

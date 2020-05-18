@@ -1,4 +1,5 @@
-import json
+from gevent import monkey
+monkey.patch_all()
 import os
 from flask import Flask, jsonify, request
 from raft.cluster import Cluster
@@ -22,9 +23,8 @@ app = create_app()
 @app.route('/raft/vote', methods=['POST'])
 def request_vote():
     candidate = request.get_json()
-    timer_thread.vote(candidate)
-    d = {"vote": True, "node": node, "candidate": candidate}
-    return jsonify(d)
+    result = timer_thread.vote(candidate)
+    return jsonify(result)
 
 
 @app.route('/raft/heartbeat', methods=['POST'])
