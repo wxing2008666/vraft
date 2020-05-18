@@ -20,7 +20,7 @@ class Leader(NodeState):
     def heartbeat(self):
         while not self.stopped:
             logging.info(f'leader ({self.node}) send heartbeat to followers')
-            logging.info('==========================================================')
+            logging.info('========================================================================')
             client = Client()
             with client as session:
                 posts = [
@@ -32,5 +32,5 @@ class Leader(NodeState):
                         logging.info(f'leader ({self.node}) got heartbeat from follower: {response.json()}')
                     else:
                         logging.info(f'leader ({self.node}) got heartbeat from follower: None')
-            logging.info('==========================================================')
+            logging.info('========================================================================')
             time.sleep(HEART_BEAT_INTERVAL)
