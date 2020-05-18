@@ -32,6 +32,8 @@ class TimerThread(threading.Thread):
         self.node_state.elect()
         if self.node_state.win():
             self.become_leader()
+        else:
+            self.become_follower()
 
     def vote(self, candidate):
         print(f' {self.node} got request vote from: {candidate} ')

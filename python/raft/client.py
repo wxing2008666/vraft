@@ -4,12 +4,13 @@ from requests.adapters import HTTPAdapter
 
 
 class Client:
-    def __init__(self):
+    def __init__(self, retry=3):
         self.session = None
+        self.retry = retry
 
     def __enter__(self):
         self.session = requests.Session()
-        retries = Retry(total=1000000,
+        retries = Retry(total=self.retry,
                         backoff_factor=0.1,
                         status_forcelist=[404])
         self.session.mount('http://', HTTPAdapter(max_retries=retries))

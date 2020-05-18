@@ -21,6 +21,7 @@ class Leader(NodeState):
         while not self.stopped:
             now = datetime.now().astimezone().replace(microsecond=0).isoformat()
             print(f'{now}: leader ({self.node}) send heartbeat to followers')
+            print('==========================================================')
             client = Client()
             with client as session:
                 posts = [
@@ -32,5 +33,5 @@ class Leader(NodeState):
                         print(f'leader ({self.node}) got heartbeat from follower: {response.json()}')
                     else:
                         print(f'leader ({self.node}) got heartbeat from follower: None')
-
+            print('==========================================================')
             time.sleep(HEART_BEAT_INTERVAL)
