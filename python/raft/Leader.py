@@ -10,7 +10,6 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='
 class Leader(NodeState):
     def __init__(self, node):
         super(Leader, self).__init__(node)
-        self.term = 0
         self.commitIndex = 0
         self.lastAppliedIndex = 0
         self.entries = []
@@ -36,4 +35,4 @@ class Leader(NodeState):
             time.sleep(HEART_BEAT_INTERVAL)
 
     def __repr__(self):
-        return f'{type(self).__name__, self.node.id, self.term}'
+        return f'{type(self).__name__, self.node.id, self.current_term}'

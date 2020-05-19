@@ -8,12 +8,12 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='
 class Candidate(NodeState):
     def __init__(self, node):
         super(Candidate, self).__init__(node)
-        self.term = 0
         self.commitIndex = 0
         self.lastAppliedIndex = 0
         self.votes = []
         self.entries = []
         self.followers = [peer for peer in self.cluster if peer != self.node]
+        self.vote_for = self.id  # candidate always votes itself
 
     def elect(self):
         logging.info(f'{self} sends request vote to peers ')
@@ -35,4 +35,4 @@ class Candidate(NodeState):
         return len(self.votes) > len(self.cluster) / 2
 
     def __repr__(self):
-        return f'{type(self).__name__, self.node.id, self.term}'
+        return f'{type(self).__name__, self.node.id, self.current_term}'

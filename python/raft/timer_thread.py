@@ -36,11 +36,16 @@ class TimerThread(threading.Thread):
         else:
             self.become_follower()
 
+    # input: candidate (id, term, lastLogIndex, lastLogTerm)
+    # output: term, vote_granted
+    # rule:
+    #   1. return false if candidate.term < current_term
+    #   2. return true if (voteFor is None or voteFor==candidate.id) and candidate's log is newer than receiver's
     def vote(self, candidate):
         logging.info(f'{self} got request vote from: {candidate} ')
         result = {"vote": False, "node": self.node, "candidate": candidate}
-        if type(self.node_state) == Follower and self.node_state.voteFor is None:
-            self.node_state.voteFor = candidate
+        if type(self.node_state) == Follower and self.node_state.vote_for is None:
+            self.node_state.vote_for = candidate
             result["vote"] = True
             self.become_follower()
 
