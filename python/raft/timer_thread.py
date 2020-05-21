@@ -16,10 +16,10 @@ cluster = Cluster()
 class TimerThread(threading.Thread):
     def __init__(self, node_id):
         threading.Thread.__init__(self)
-        self.election_timeout = float(randrange(1, 3))
-        self.election_timer = threading.Timer(self.election_timeout, self.become_candidate)
         self.node = cluster[node_id]
         self.node_state = Follower(self.node)
+        self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX))
+        self.election_timer = threading.Timer(self.election_timeout, self.become_candidate)
 
     def become_leader(self):
         logging.info(f'{self} become leader and start to send heartbeat ... ')

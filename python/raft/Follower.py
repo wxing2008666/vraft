@@ -1,4 +1,12 @@
+import threading
+from random import randrange
+
 from NodeState import NodeState
+import logging
+
+from cluster import ELECTION_TIMEOUT_MAX
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
 
 class Follower(NodeState):
