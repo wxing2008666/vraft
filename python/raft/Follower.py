@@ -13,8 +13,8 @@ class Follower(NodeState):
     def __init__(self, node):
         super(Follower, self).__init__(node)
         self.leader = None
-        self.commitIndex = 0
-        self.lastAppliedIndex = 0
+        self.commit_index = 0
+        self.last_applied_index = 0
         # next log entry to be sent by leader
         self.nextIndex = 0
         # index of highest log entry known to be replicated on server

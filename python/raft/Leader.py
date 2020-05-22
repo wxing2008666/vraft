@@ -8,11 +8,12 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='
 
 
 class Leader(NodeState):
-    def __init__(self, node):
-        super(Leader, self).__init__(node)
-        self.commitIndex = 0
-        self.lastAppliedIndex = 0
-        self.entries = []
+    def __init__(self, candidate):
+        super(Leader, self).__init__(candidate.node)
+        self.current_term = candidate.current_term
+        self.commit_index = candidate.commit_index
+        self.last_applied_index = candidate.last_applied_index
+        self.entries = candidate.entries
         self.stopped = False
         self.followers = [peer for peer in self.cluster if peer != self.node]
 

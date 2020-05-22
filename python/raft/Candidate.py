@@ -18,12 +18,13 @@ class Candidate(NodeState):
     TODO add pre election later
     """
 
-    def __init__(self, node):
-        super(Candidate, self).__init__(node)
-        self.commitIndex = 0
-        self.lastAppliedIndex = 0
+    def __init__(self, follower):
+        super(Candidate, self).__init__(follower.node)
+        self.current_term = follower.current_term
+        self.commit_index = follower.commit_index
+        self.last_applied_index = follower.last_applied_index
         self.votes = []
-        self.entries = []
+        self.entries = follower.entries
         self.followers = [peer for peer in self.cluster if peer != self.node]
         self.vote_for = self.id  # candidate always votes itself
 
