@@ -1,8 +1,25 @@
+import collections
+import json
+
 import grequests
 from NodeState import NodeState
 from client import Client
 import logging
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
+
+
+class VoteRequest:
+    def __init__(self, candidate):
+        self.candidate_id = candidate.id
+        self.term = candidate.current_term
+        # TODO initialize log info when implement raft log replication
+        self.last_log_index = 0
+        self.last_log_term = 0
+
+    def to_json(self):
+        return json.dumps(self, default=lambda o: o.__dict__,
+                          sort_keys=True, indent=4)
 
 
 class Candidate(NodeState):
@@ -41,8 +58,8 @@ class Candidate(NodeState):
         self.votes.append(self.node)
         client = Client()
         with client as session:
-            posts = [
-                grequests.post(f'http://{peer.uri}/raft/vote', json=self.node, session=session)
+            posts = [  # VoteRequest(self)
+                grequests.post(f'http://{peer.uri}/raft/vote', json=VoteRequest(self).to_json(), session=session)
                 for peer in self.followers
             ]
             for response in grequests.imap(posts):

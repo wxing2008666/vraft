@@ -1,3 +1,4 @@
+import json
 import sys
 import threading
 from random import randrange
@@ -5,7 +6,7 @@ import logging
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
-from Candidate import Candidate
+from Candidate import Candidate, VoteRequest
 from Follower import Follower
 from Leader import Leader
 from cluster import Cluster, ELECTION_TIMEOUT_MAX
@@ -41,18 +42,15 @@ class TimerThread(threading.Thread):
     # rule:
     #   1. return false if candidate.term < current_term
     #   2. return true if (voteFor is None or voteFor==candidate.id) and candidate's log is newer than receiver's
-    def vote(self, candidate):
-        logging.info(f'{self} got request vote from: {candidate} ')
-        result = {"vote": False, "node": self.node, "candidate": candidate}
-        if type(self.node_state) == Follower and self.node_state.vote_for is None:
-            self.node_state.vote_for = candidate
-            result["vote"] = True
-            self.become_follower()
+    def vote(self, vote_request: VoteRequest):
+        logging.info(f'{self} got vote request: {vote_request} ')
+        vote_result = self.node_state.vote(vote_request)
+        if vote_result.vote_granted:
+            self.become_follower(self.node_state)
+        logging.info(f'{self} return vote result: {vote_result} ')
+        return vote_result
 
-        logging.info(f'{self} return vote result: {result} ')
-        return result
-
-    def become_follower(self):
+    def become_follower(self, node_state):
         timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX))
         if type(self.node_state) != Follower:
             logging.info(f'{self} become follower ... ')
@@ -63,7 +61,7 @@ class TimerThread(threading.Thread):
         self.election_timer.start()
 
     def run(self):
-        self.become_follower()
+        self.become_follower(self.node_state)
 
     def __repr__(self):
         return f'{type(self).__name__, self.node_state}'

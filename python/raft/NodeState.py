@@ -1,4 +1,13 @@
 from cluster import Cluster
+import logging
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
+
+
+class VoteResult:
+    def __init__(self, vote_granted, term):
+        self.term = term
+        self.vote_granted = vote_granted
 
 
 class NodeState:
@@ -16,10 +25,21 @@ class NodeState:
     # rule:
     #   1. return false if candidate.term < current_term
     #   2. return true if (voteFor is None or voteFor==candidate.id) and candidate's log is newer than receiver's
-    def vote(self, candidate):
-        if candidate.current_term < self.current_term:
-            return False, self.current_term
-        if self.vote_for is None or self.vote_for == candidate.id:
+    def vote(self, vote_request):
+        term = vote_request['term']
+        candidate_id = vote_request['candidate_id']
+        if term > self.current_term:
+            logging.info(f'{self} approves vote request since term: {term} > {self.current_term}')
+            self.vote_for = candidate_id
+            self.current_term = term
+            return VoteResult(True, self.current_term)
+        if term < self.current_term:
+            logging.info(f'{self} rejects vote request since term: {term} < {self.current_term}')
+            return VoteResult(False, self.current_term)
+        # vote_request.term == self.current_term
+        if self.vote_for is None or self.vote_for == candidate_id:
             # TODO check if the candidate's log is newer than receiver's
-            return True, self.current_term
-        return False
+            self.vote_for = candidate_id
+            return VoteResult(True, self.current_term)
+        logging.info(f'{self} rejects vote request since vote_for: {self.vote_for} != {candidate_id}')
+        return VoteResult(False, self.current_term)

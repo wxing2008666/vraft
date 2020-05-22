@@ -1,3 +1,5 @@
+import json
+
 from gevent import monkey
 
 monkey.patch_all()
@@ -26,8 +28,8 @@ app = create_app()
 
 @app.route('/raft/vote', methods=['POST'])
 def request_vote():
-    candidate = request.get_json()
-    result = timer_thread.vote(candidate)
+    vote_request = request.get_json()
+    result = timer_thread.vote(json.loads(vote_request))
     return jsonify(result)
 
 
