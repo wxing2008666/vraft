@@ -1,4 +1,3 @@
-import json
 import sys
 import threading
 from random import randrange
@@ -45,12 +44,12 @@ class TimerThread(threading.Thread):
     def vote(self, vote_request: VoteRequest):
         logging.info(f'{self} got vote request: {vote_request} ')
         vote_result = self.node_state.vote(vote_request)
-        if vote_result.vote_granted:
-            self.become_follower(self.node_state)
+        if vote_result[0]:
+            self.become_follower()
         logging.info(f'{self} return vote result: {vote_result} ')
         return vote_result
 
-    def become_follower(self, node_state):
+    def become_follower(self):
         timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX))
         if type(self.node_state) != Follower:
             logging.info(f'{self} become follower ... ')
@@ -61,7 +60,7 @@ class TimerThread(threading.Thread):
         self.election_timer.start()
 
     def run(self):
-        self.become_follower(self.node_state)
+        self.become_follower()
 
     def __repr__(self):
         return f'{type(self).__name__, self.node_state}'

@@ -65,8 +65,8 @@ class Candidate(NodeState):
             for response in grequests.imap(posts):
                 logging.info(f'{self} got vote result: {response.status_code}: {response.json()}')
                 result = response.json()
-                if result['vote']:
-                    self.votes.append(result['node'])
+                if result[0]:  # vote_granted
+                    self.votes.append(result[2])  # id
 
     def win(self):
         return len(self.votes) > len(self.cluster) / 2
