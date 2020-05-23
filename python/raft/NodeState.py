@@ -41,3 +41,9 @@ class NodeState:
             return VoteResult(True, self.current_term, self.id)
         logging.info(f'{self} rejects vote request since vote_for: {self.vote_for} != {candidate_id}')
         return VoteResult(False, self.current_term, self.id)
+
+    # another thread might change the state into Follower when got heartbeat
+    # only candidate could return True
+    # it returns False for both Leader and Follower
+    def win(self):
+        return False
