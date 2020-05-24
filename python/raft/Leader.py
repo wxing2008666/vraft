@@ -1,9 +1,14 @@
 import time
+from random import randrange
+
 import grequests
 from NodeState import NodeState
 from client import Client
-from cluster import HEART_BEAT_INTERVAL
+from cluster import HEART_BEAT_INTERVAL, ELECTION_TIMEOUT_MAX
 import logging
+
+from monitor import send_state_update, send_heartbeat
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
 
@@ -16,11 +21,13 @@ class Leader(NodeState):
         self.entries = candidate.entries
         self.stopped = False
         self.followers = [peer for peer in self.cluster if peer != self.node]
+        self.election_timeout = float(randrange(ELECTION_TIMEOUT_MAX / 2, ELECTION_TIMEOUT_MAX))
 
     def heartbeat(self):
         while not self.stopped:
             logging.info(f'{self} send heartbeat to followers')
             logging.info('========================================================================')
+            send_heartbeat(self, HEART_BEAT_INTERVAL)
             client = Client()
             with client as session:
                 posts = [

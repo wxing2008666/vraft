@@ -3,6 +3,8 @@ import threading
 from random import randrange
 import logging
 
+from monitor import send_state_update
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
 from Candidate import Candidate, VoteRequest
@@ -23,12 +25,14 @@ class TimerThread(threading.Thread):
 
     def become_leader(self):
         logging.info(f'{self} become leader and start to send heartbeat ... ')
+        send_state_update(self.node_state, self.election_timeout)
         self.node_state = Leader(self.node_state)
         self.node_state.heartbeat()
 
     def become_candidate(self):
         logging.warning(f'heartbeat is timeout: {int(self.election_timeout)} s')
         logging.info(f'{self} become candidate and start to request vote ... ')
+        send_state_update(self.node_state, self.election_timeout)
         self.node_state = Candidate(self.node_state)
         self.node_state.elect()
         if self.node_state.win():
@@ -55,6 +59,7 @@ class TimerThread(threading.Thread):
             logging.info(f'{self} become follower ... ')
             self.node_state = Follower(self.node)
         logging.info(f'{self} reset election timer {timeout} s ... ')
+        send_state_update(self.node_state, timeout)
         self.election_timer.cancel()
         self.election_timer = threading.Timer(timeout, self.become_candidate)
         self.election_timer.start()
